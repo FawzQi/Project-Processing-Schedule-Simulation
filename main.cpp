@@ -547,7 +547,6 @@ void display(menu_t menu) {
                         robin_queue.push_back(p);
                     }
                 }
-                // robin_queue.push_back(processes[i]);
             }
         }
 
@@ -587,61 +586,11 @@ void display(menu_t menu) {
                 p.remaining_time = p.burst_time;  // Reset remaining time
             }
 
-            // SORT PROCESSES as id
             std::sort(processes.begin(), processes.end(), [](const process_t& a, const process_t& b) {
                 return a.id < b.id;
             });
         }
     }
-
-    //     DrawText("RR", 10, 10, 20, BLACK);
-    //     // Implement RR logic here
-    //     // Draw vertical lines and time labels first (behind boxes)
-    //     float total_width = 0;
-    //     for (const auto& p : processes) {
-    //         total_width += p.burst_time * 6;
-    //     }
-    //     for (int i = 0; i <= total_width + 30; i += 30) {
-    //         DrawLine(160 + i, 180, 160 + i, 180 + processes.size() * 25, BLACK);
-    //         DrawText(TextFormat("%d", (i) / 6), 160 + i, 160, 10, BLACK);
-    //     }
-
-    //     // Round Robin simulation
-    //     float box_width = 0;
-    //     const int quantum = 5;  // time quantum
-    //     static std::vector<RR_process_t> rr_process_img;
-    //     static bool rr_simulated = false;
-    //     if (!rr_simulated) {
-    //         rr_process_img.clear();
-    //         std::deque<process_t> rr_queue(processes.begin(), processes.end());
-    //         std::vector<int> remaining_time;
-    //         for (const auto& p : processes) remaining_time.push_back(p.burst_time);
-    //         int time = 0;
-    //         while (!rr_queue.empty()) {
-    //             process_t proc = rr_queue.front();
-    //             rr_queue.pop_front();
-    //             int idx = proc.id;
-    //             int exec_time = std::min(quantum, remaining_time[idx]);
-    //             if (exec_time > 0) {
-    //                 rr_process_img.push_back({proc.id, exec_time});
-    //                 remaining_time[idx] -= exec_time;
-    //                 time += exec_time;
-    //                 if (remaining_time[idx] > 0) {
-    //                     rr_queue.push_back(proc);
-    //                 }
-    //             }
-    //         }
-    //         rr_simulated = true;
-    //     }
-
-    //     for (int i = 0; i < rr_process_img.size(); ++i) {
-    //         Rectangle process_box = {160 + box_width, 180 + rr_process_img[i].id * 25, rr_process_img[i].burst_time * 6, 20};
-    //         DrawText(TextFormat("Process %d", rr_process_img[i].id), 10, 180 + rr_process_img[i].id * 25, 20, processes[rr_process_img[i].id].color);
-    //         DrawRectangleRec(process_box, processes[rr_process_img[i].id].color);
-    //         box_width += rr_process_img[i].burst_time * 6;
-    //     }
-    //     // Add replay and back button logic if needed (similar to other algorithms)
-    // }
 }
 
 int main() {
@@ -649,11 +598,8 @@ int main() {
     const int screenWidth = 800;
     const int screenHeight = 600;
     InitWindow(screenWidth, screenHeight, "Process Scheduling Simulator");
-
-    // Set the target FPS
     SetTargetFPS(60);
 
-    // Main game loop
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(RAYWHITE);
@@ -663,7 +609,6 @@ int main() {
         time_frame++;
     }
 
-    // Close the window
     CloseWindow();
 
     return 0;
