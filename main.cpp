@@ -1,7 +1,6 @@
 #include <raylib.h>
 
 #include <algorithm>
-#include <deque>  // Untuk std::deque
 #include <iostream>
 #include <set>
 #include <string>
@@ -24,7 +23,6 @@ enum class menu_t {
     HOME = 0,
     FCFS,
     SJF,
-    SJFP,
     RR,
 };
 
@@ -92,8 +90,6 @@ void sort_processes(menu_t algorithm) {
         sort(processes.begin(), processes.end(), [](const process_t& a, const process_t& b) {
             return a.burst_time < b.burst_time;
         });
-    } else if (algorithm == menu_t::SJFP) {
-        // Implement SJF-P logic here
     } else if (algorithm == menu_t::RR) {
         sort(processes.begin(), processes.end(), [](const process_t& a, const process_t& b) {
             return a.arrival_time < b.arrival_time;
@@ -147,16 +143,6 @@ void display(menu_t menu) {
         if (CheckCollisionPointRec(GetMousePosition(), sjf_button) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             algorithm_type = menu_t::SJF;
         }
-        // Rectangle sjfp_button = {10, 160, 100, 25};
-        // if (algorithm_type == menu_t::SJFP) {
-        //     DrawRectangleRec(sjfp_button, DARKGRAY);
-        // } else {
-        //     DrawRectangleRec(sjfp_button, LIGHTGRAY);
-        // }
-        // DrawText("SJF-P", sjfp_button.x + 5, sjfp_button.y + 5, 20, BLACK);
-        // if (CheckCollisionPointRec(GetMousePosition(), sjfp_button) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        //     algorithm_type = menu_t::SJFP;
-        // }
         Rectangle rr_button = {10, 160, 100, 25};
         if (algorithm_type == menu_t::RR) {
             DrawRectangleRec(rr_button, DARKGRAY);
@@ -247,6 +233,9 @@ void display(menu_t menu) {
             }
         }
 
+        if (algorithm_type == menu_t::RR) {
+            DrawText("Time Quantum: 5", 10, 200, 20, BLACK);
+        }
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
             is_clicked = false;
         }
@@ -475,6 +464,11 @@ void display(menu_t menu) {
         }
 
     } else if (menu == menu_t::RR) {
+        float box_width = 0;
+
+        static std::vector<process_t> process_in;
+        static std::vector<RR_process_t> rr_process_img;
+        static std::vector<process_t> rr_queue;
         DrawText("RR", 10, 10, 20, BLACK);
 
         float total_width = 0;
@@ -486,11 +480,6 @@ void display(menu_t menu) {
             DrawText(TextFormat("%d", (i) / 6), 160 + i, 160, 10, BLACK);
         }
 
-        float box_width = 0;
-
-        static std::vector<process_t> process_in;
-        static std::vector<RR_process_t> rr_process_img;
-        static std::vector<process_t> rr_queue;
         process_in.clear();
         for (int i = 0; i < processes.size(); ++i) {
             if (processes[i].arrival_time <= (time_frame - start_simulation) / 12) {
@@ -509,7 +498,7 @@ void display(menu_t menu) {
                     if (rr_queue[i].remaining_time > 5) {
                         rr_process_img.push_back({rr_queue[i].id, 5});
                         rr_queue[i].remaining_time -= 5;
-                        simulation_rendered = false;  // Continue simulating until all processes are finished
+                        simulation_rendered = false;
                     } else {
                         rr_process_img.push_back({rr_queue[i].id, rr_queue[i].remaining_time});
                         rr_queue[i].remaining_time = 0;
@@ -553,16 +542,13 @@ void display(menu_t menu) {
         DrawText("    Queue :", 40, 130, 20, BLACK);
 
         for (int k = 0; k < robin_queue.size(); ++k) {
-            // if (colide_id != robin_queue[k].id) {
             Rectangle queue_box = {160.0f + k * 35.0f, 130.0f, 30.0f, 20.0f};
             DrawRectangleRec(queue_box, robin_queue[k].color);
             DrawText(TextFormat("P%d", robin_queue[k].id), queue_box.x, queue_box.y - 20, 20, robin_queue[k].color);
         }
 
         DrawRectangle(160 + (time_frame - start_simulation) / 2, 180, 800, processes.size() * 25, RAYWHITE);
-        // draw queue
 
-        // Add replay and back button logic if needed (similar to other algorithms)
         Rectangle replay_button = {10, 400, 100, 25};
         DrawRectangleRec(replay_button, LIGHTGRAY);
         DrawText("Replay", replay_button.x + 5, replay_button.y + 5, 20, BLACK);
@@ -571,7 +557,7 @@ void display(menu_t menu) {
             rr_process_img.clear();
             rr_queue.clear();
             for (auto& p : processes) {
-                p.remaining_time = p.burst_time;  // Reset remaining time
+                p.remaining_time = p.burst_time;
             }
         }
         Rectangle back_button = {10, 440, 100, 25};
